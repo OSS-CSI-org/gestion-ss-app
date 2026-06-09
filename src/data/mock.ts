@@ -89,7 +89,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 1, datePrescription: '2026-06-02', type: 'MEDICAMENT', contenu: 'Paracétamol 500mg - 1 comprimé 3x/jour pendant 5 jours', numConsultation: 1, nomMedicament: 'Paracétamol', posologie: '1 comprimé 3x/jour', dosage: '500mg' },
     ],
     remboursements: [
-      { numRemboursement: 1, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EN_ATTENTE', numFeuille: 1 },
+      { numRemboursement: 1, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EN_ATTENTE', numFeuille: 1 },
     ],
   },
   {
@@ -117,8 +117,8 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 3, datePrescription: '2026-06-01', type: 'CONSULTATION_SPECIALISTE', contenu: 'Consultation rhumatologue', numConsultation: 2, typeExamen: 'Consultation', motifMedical: 'Douleurs articulaires chroniques', numSpecialiste: 3, nomSpecialiste: 'Dr. Eyenga Anne' },
     ],
     remboursements: [
-      { numRemboursement: 2, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 2 },
-      { numRemboursement: 3, nature: 'Consultation spécialiste', taux: 1.0, montant: 9000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 2 },
+      { numRemboursement: 2, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 2 },
+      { numRemboursement: 3, nature: 'Consultation spécialiste', taux: 0.8, montant: 9000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 2 },
     ],
   },
   {
@@ -143,7 +143,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 4, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EN_ATTENTE', numFeuille: 3 },
+      { numRemboursement: 4, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EN_ATTENTE', numFeuille: 3 },
     ],
   },
   {
@@ -170,7 +170,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 4, datePrescription: '2026-05-28', type: 'CONSULTATION_SPECIALISTE', contenu: 'Consultation dermatologue', numConsultation: 4, typeExamen: 'Consultation', motifMedical: 'Lésion cutanée suspecte', numSpecialiste: 4, nomSpecialiste: 'Dr. Mbah David' },
     ],
     remboursements: [
-      { numRemboursement: 5, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 4 },
+      { numRemboursement: 5, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 4 },
     ],
   },
   {
@@ -195,7 +195,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 6, nature: 'Consultation spécialiste', taux: 1.0, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 5, dateRemboursement: '2026-05-27', agentLogin: 'admin' },
+      { numRemboursement: 6, nature: 'Consultation spécialiste', taux: 0.8, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 5, dateRemboursement: '2026-05-27', agentLogin: 'admin' },
     ],
   },
   {
@@ -219,7 +219,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 7, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 6, dateRemboursement: '2026-05-23', agentLogin: 'admin' },
+      { numRemboursement: 7, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 6, dateRemboursement: '2026-05-23', agentLogin: 'admin' },
     ],
   },
   {
@@ -242,7 +242,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 8, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 7, dateRemboursement: '2026-05-20', agentLogin: 'admin' },
+      { numRemboursement: 8, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 7, dateRemboursement: '2026-05-20', agentLogin: 'admin' },
     ],
   },
   {
@@ -265,7 +265,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 9, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 8, dateRemboursement: '2026-05-19', agentLogin: 'admin' },
+      { numRemboursement: 9, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 8, dateRemboursement: '2026-05-19', agentLogin: 'admin' },
     ],
   },
   {
@@ -288,7 +288,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 10, nature: 'Consultation spécialiste', taux: 1.0, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 9, dateRemboursement: '2026-05-16', agentLogin: 'admin' },
+      { numRemboursement: 10, nature: 'Consultation spécialiste', taux: 0.8, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 9, dateRemboursement: '2026-05-16', agentLogin: 'admin' },
     ],
   },
   {
@@ -315,7 +315,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 5, datePrescription: '2026-05-12', type: 'MEDICAMENT', contenu: 'Amoxicilline 1g - 1 comprimé 3x/jour pendant 7 jours', numConsultation: 10, nomMedicament: 'Amoxicilline', posologie: '1 comprimé 3x/jour', dosage: '1g' },
     ],
     remboursements: [
-      { numRemboursement: 11, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 10, dateRemboursement: '2026-05-13', agentLogin: 'admin' },
+      { numRemboursement: 11, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 10, dateRemboursement: '2026-05-13', agentLogin: 'admin' },
     ],
   },
   {
@@ -340,7 +340,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 12, nature: 'Consultation spécialiste', taux: 1.0, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 11, dateRemboursement: '2026-05-11', agentLogin: 'admin' },
+      { numRemboursement: 12, nature: 'Consultation spécialiste', taux: 0.8, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 11, dateRemboursement: '2026-05-11', agentLogin: 'admin' },
     ],
   },
   {
@@ -367,7 +367,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 6, datePrescription: '2026-05-08', type: 'MEDICAMENT', contenu: 'Hydroquinone 4% crème - application locale soir 1x/jour', numConsultation: 12, nomMedicament: 'Hydroquinone 4%', posologie: 'application locale soir 1x/jour', dosage: '4%' },
     ],
     remboursements: [
-      { numRemboursement: 13, nature: 'Consultation spécialiste', taux: 1.0, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 12, dateRemboursement: '2026-05-09', agentLogin: 'admin' },
+      { numRemboursement: 13, nature: 'Consultation spécialiste', taux: 0.8, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 12, dateRemboursement: '2026-05-09', agentLogin: 'admin' },
     ],
   },
   {
@@ -392,7 +392,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 14, nature: 'Consultation spécialiste', taux: 1.0, montant: 10000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 13, dateRemboursement: '2026-05-05', agentLogin: 'admin' },
+      { numRemboursement: 14, nature: 'Consultation spécialiste', taux: 0.8, montant: 10000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 13, dateRemboursement: '2026-05-05', agentLogin: 'admin' },
     ],
   },
   {
@@ -415,7 +415,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 15, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 14, dateRemboursement: '2026-05-04', agentLogin: 'admin' },
+      { numRemboursement: 15, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 14, dateRemboursement: '2026-05-04', agentLogin: 'admin' },
     ],
   },
   {
@@ -440,7 +440,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 16, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 15, dateRemboursement: '2026-04-29', agentLogin: 'admin' },
+      { numRemboursement: 16, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 15, dateRemboursement: '2026-04-29', agentLogin: 'admin' },
     ],
   },
   {
@@ -467,7 +467,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 7, datePrescription: '2026-04-25', type: 'MEDICAMENT', contenu: 'Salbutamol inhalé - 2 bouffées si besoin, 1 récipient', numConsultation: 16, nomMedicament: 'Salbutamol', posologie: '2 bouffées si besoin', dosage: '100µg/dose' },
     ],
     remboursements: [
-      { numRemboursement: 17, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 16, dateRemboursement: '2026-04-25', agentLogin: 'admin' },
+      { numRemboursement: 17, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 16, dateRemboursement: '2026-04-25', agentLogin: 'admin' },
     ],
   },
   {
@@ -492,7 +492,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 18, nature: 'Consultation généraliste', taux: 0.8, montant: 3500, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 17, dateRemboursement: '2026-04-23', agentLogin: 'admin' },
+      { numRemboursement: 18, nature: 'Consultation généraliste', taux: 1.0, montant: 3500, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 17, dateRemboursement: '2026-04-23', agentLogin: 'admin' },
     ],
   },
   {
@@ -519,7 +519,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 8, datePrescription: '2026-04-18', type: 'MEDICAMENT', contenu: 'Sumatriptan 50mg - 1 comprimé au début de la crise', numConsultation: 18, nomMedicament: 'Sumatriptan', posologie: '1 comprimé au début de la crise', dosage: '50mg' },
     ],
     remboursements: [
-      { numRemboursement: 19, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 18, dateRemboursement: '2026-04-19', agentLogin: 'admin' },
+      { numRemboursement: 19, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 18, dateRemboursement: '2026-04-19', agentLogin: 'admin' },
     ],
   },
   {
@@ -544,7 +544,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 20, nature: 'Consultation spécialiste', taux: 1.0, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 19, dateRemboursement: '2026-04-16', agentLogin: 'admin' },
+      { numRemboursement: 20, nature: 'Consultation spécialiste', taux: 0.8, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 19, dateRemboursement: '2026-04-16', agentLogin: 'admin' },
     ],
   },
   {
@@ -569,7 +569,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 21, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 20, dateRemboursement: '2026-04-11', agentLogin: 'admin' },
+      { numRemboursement: 21, nature: 'Consultation généraliste', taux: 1.0, montant: 4000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 20, dateRemboursement: '2026-04-11', agentLogin: 'admin' },
     ],
   },
   {
@@ -594,7 +594,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 22, nature: 'Consultation généraliste', taux: 0.8, montant: 3500, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 21, dateRemboursement: '2026-04-06', agentLogin: 'admin' },
+      { numRemboursement: 22, nature: 'Consultation généraliste', taux: 1.0, montant: 3500, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 21, dateRemboursement: '2026-04-06', agentLogin: 'admin' },
     ],
   },
   {
@@ -619,7 +619,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 23, nature: 'Consultation spécialiste', taux: 1.0, montant: 12000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 22, dateRemboursement: '2026-03-28', agentLogin: 'admin' },
+      { numRemboursement: 23, nature: 'Consultation spécialiste', taux: 0.8, montant: 12000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 22, dateRemboursement: '2026-03-28', agentLogin: 'admin' },
     ],
   },
   {
@@ -646,7 +646,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 9, datePrescription: '2026-03-22', type: 'MEDICAMENT', contenu: 'Collyre antibiotique - 1 goutte 4x/jour pendant 7 jours', numConsultation: 23, nomMedicament: 'Collyre antibiotique', posologie: '1 goutte 4x/jour', dosage: '0.3%' },
     ],
     remboursements: [
-      { numRemboursement: 24, nature: 'Consultation spécialiste', taux: 1.0, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 23, dateRemboursement: '2026-03-23', agentLogin: 'admin' },
+      { numRemboursement: 24, nature: 'Consultation spécialiste', taux: 0.8, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 23, dateRemboursement: '2026-03-23', agentLogin: 'admin' },
     ],
   },
   {
@@ -671,7 +671,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 26, nature: 'Consultation spécialiste', taux: 1.0, montant: 6000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 25, dateRemboursement: '2026-03-11', agentLogin: 'admin' },
+      { numRemboursement: 26, nature: 'Consultation spécialiste', taux: 0.8, montant: 6000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 25, dateRemboursement: '2026-03-11', agentLogin: 'admin' },
     ],
   },
 ]
