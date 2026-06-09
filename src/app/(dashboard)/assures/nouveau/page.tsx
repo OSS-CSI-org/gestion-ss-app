@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useKeyboard } from '@/hooks/useKeyboard'
-import { medecins } from '@/data/mock'
+import { useMedecins } from '@/hooks/data/useMedecins'
+import { createAssure } from '@/lib/services/assures'
+import { useToast } from '@/components/ui/Toast'
 import { assureSchema, type AssureFormData } from '@/lib/schemas'
 import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
@@ -14,7 +16,6 @@ import Button from '@/components/ui/Button'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import RoleGuard from '@/components/auth/RoleGuard'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
 
 export default function NouvelAssurePage() {
   return (
@@ -26,6 +27,8 @@ export default function NouvelAssurePage() {
 
 function NouvelAssureForm() {
   const router = useRouter()
+  const { medecins } = useMedecins()
+  const toast = useToast()
 
   const { control, register, handleSubmit, formState: { errors, isSubmitting } } = useForm<AssureFormData>({
     resolver: zodResolver(assureSchema),
@@ -44,9 +47,14 @@ function NouvelAssureForm() {
     .filter(m => m.typeMedecin === 'GENERALISTE' && m.actif)
     .map(m => ({ value: String(m.numMedecin), label: `Dr. ${m.prenom} ${m.nom}` }))
 
-  const onSubmit = (data: AssureFormData) => {
-    console.log('Nouvel assuré:', data)
-    router.push('/assures')
+  const onSubmit = async (data: AssureFormData) => {
+    try {
+      await createAssure(data)
+      toast.show('Assuré inscrit avec succès', 'success')
+      router.push('/assures')
+    } catch {
+      toast.show("L'inscription a échoué", 'error')
+    }
   }
 
   return (
@@ -55,7 +63,6 @@ function NouvelAssureForm() {
         <Link href="/assures" className="text-text-anthracite/60 hover:text-prune-main transition-colors">
           <ArrowLeft size={20} />
         </Link>
-        <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Assurés', href: '/assures' }, { label: 'Nouvel assuré' }]} />
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">Nouvel assuré</h1>
           <p className="text-sm text-text-anthracite/60">Inscription d&apos;une personne à la sécurité sociale</p>

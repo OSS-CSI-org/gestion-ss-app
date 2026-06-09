@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { medecins } from '@/data/mock'
 import { Medecin, TypeMedecin } from '@/lib/types'
+import { useMedecins } from '@/hooks/data/useMedecins'
+import { deleteMedecin } from '@/lib/services/medecins'
 import Card from '@/components/ui/Card'
 import DataTable from '@/components/ui/DataTable'
 import Badge from '@/components/ui/Badge'
+import { TableSkeleton } from '@/components/ui/Skeleton'
 import { Search, Filter, Plus, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -19,16 +21,15 @@ import { useToast } from '@/components/ui/Toast'
 export default function MedecinsPage() {
   const router = useRouter()
   const { user } = useAuth()
+  const { medecins, isLoading, mutate } = useMedecins()
   const { confirm: ask, dialog: confirmDialog } = useConfirm()
   const toast = useToast()
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
   const [filterType, setFilterType] = useState<TypeMedecin | 'TOUS'>('TOUS')
   const searchRef = useRef<HTMLInputElement>(null)
-  const [deletedIds, setDeletedIds] = useState<number[]>([])
 
   const filtered = medecins.filter(m => {
-    if (deletedIds.includes(m.numMedecin)) return false
     const matchesSearch = `${m.nom} ${m.prenom}`.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       (m.email && m.email.toLowerCase().includes(debouncedSearch.toLowerCase()))
     const matchesType = filterType === 'TOUS' || m.typeMedecin === filterType
@@ -46,8 +47,13 @@ export default function MedecinsPage() {
   const handleDelete = async (m: Medecin) => {
     const ok = await ask(`Êtes-vous sûr de vouloir supprimer Dr. ${m.prenom} ${m.nom} ? Cette action est irréversible.`)
     if (ok) {
-      setDeletedIds(prev => [...prev, m.numMedecin])
-      toast.show(`Dr. ${m.prenom} ${m.nom} a été supprimé`, 'success')
+      try {
+        await deleteMedecin(m.numMedecin)
+        await mutate()
+        toast.show(`Dr. ${m.prenom} ${m.nom} a été supprimé`, 'success')
+      } catch {
+        toast.show('La suppression a échoué', 'error')
+      }
     }
   }
 
@@ -110,7 +116,7 @@ export default function MedecinsPage() {
       <div className="flex items-end justify-between mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">Médecins</h1>
-          <p className="text-sm text-text-anthracite/60">{medecins.length} praticiens référencés</p>
+          <p className="text-sm text-text-anthracite/60">{filtered.length} praticiens référencés</p>
         </div>
         {user?.role === 'AGENT_OSS' && (
           <Link href="/medecins/nouveau">
@@ -153,11 +159,15 @@ export default function MedecinsPage() {
             ))}
           </div>
         </div>
-        <DataTable
-          columns={columns}
-          data={filtered}
-          onRowClick={(m: Medecin) => router.push(`/medecins/${m.numMedecin}`)}
-        />
+        {isLoading ? (
+          <TableSkeleton rows={6} />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filtered}
+            onRowClick={(m: Medecin) => router.push(`/medecins/${m.numMedecin}`)}
+          />
+        )}
       </Card>
       {confirmDialog}
     </div>

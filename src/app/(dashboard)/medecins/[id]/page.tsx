@@ -3,8 +3,12 @@
 import { use, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { medecins, assures, feuillesMaladie, mettreAJourMotDePasse, supprimerMedecin } from '@/data/mock'
+import { useMedecin } from '@/hooks/data/useMedecins'
+import { useAssures } from '@/hooks/data/useAssures'
+import { useFeuilles } from '@/hooks/data/useFeuilles'
+import { changePassword, deleteMedecin } from '@/lib/services/medecins'
 import { FeuilleMaladie } from '@/lib/types'
+import Skeleton from '@/components/ui/Skeleton'
 import { passwordSchema, type PasswordFormData } from '@/lib/schemas'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -14,7 +18,6 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { ArrowLeft, Mail, Calendar, User, Stethoscope, Activity, FileText, Trash2, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import EmptyState from '@/components/ui/EmptyState'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import Link from 'next/link'
 import { formatDateShort } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
@@ -28,18 +31,9 @@ export default function MedecinDetailPage({ params }: { params: Promise<{ id: st
   const { confirm: ask, dialog: confirmDialog } = useConfirm()
   const toast = useToast()
   const router = useRouter()
-  const medecin = medecins.find(m => m.numMedecin === Number(id))
-
-  if (!medecin) {
-    return (
-      <div>
-        <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Médecins', href: '/medecins' }]} />
-        <Card>
-          <p className="text-text-anthracite/60 text-center py-8">Médecin introuvable</p>
-        </Card>
-      </div>
-    )
-  }
+  const { medecin, isLoading } = useMedecin(Number(id))
+  const { assures } = useAssures()
+  const { feuilles } = useFeuilles()
 
   const [showMdpForm, setShowMdpForm] = useState(false)
   const [showAncien, setShowAncien] = useState(false)
@@ -47,28 +41,53 @@ export default function MedecinDetailPage({ params }: { params: Promise<{ id: st
   const [showConfirmer, setShowConfirmer] = useState(false)
   const [mdpError, setMdpError] = useState('')
   const [mdpSuccess, setMdpSuccess] = useState(false)
-  const estProprietaire = user?.login === medecin.login
 
   const { register: pwdRegister, handleSubmit: pwdHandleSubmit, formState: { errors: pwdErrors }, reset: pwdReset } = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),
   })
 
-  const consultations = feuillesMaladie.filter(f => f.numMedecin === medecin.numMedecin)
+  const estProprietaire = user?.login === medecin?.login
+  const consultations = feuilles.filter(f => medecin && f.numMedecin === medecin.numMedecin)
   const patientsVus = new Set(consultations.map(f => f.numAssure)).size
 
-  const handleChangerMdp = (data: PasswordFormData) => {
+  const handleChangerMdp = async (data: PasswordFormData) => {
+    if (!medecin) return
     setMdpError('')
     setMdpSuccess(false)
-
-    if (data.ancienMdp !== user?.motDePasse) {
-      setMdpError('Ancien mot de passe incorrect')
-      return
+    try {
+      await changePassword(medecin.numMedecin, data.ancienMdp, data.nouveauMdp)
+      setMdpSuccess(true)
+      pwdReset()
+      setShowMdpForm(false)
+    } catch (e) {
+      setMdpError(e instanceof Error ? e.message : 'Ancien mot de passe incorrect')
     }
+  }
 
-    mettreAJourMotDePasse(medecin.login, data.nouveauMdp)
-    setMdpSuccess(true)
-    pwdReset()
-    setShowMdpForm(false)
+  const handleSupprimer = async () => {
+    if (!medecin) return
+    let msg = `Êtes-vous sûr de vouloir supprimer Dr. ${medecin.prenom} ${medecin.nom} ?`
+    const assuresAffectes = assures.filter(a => a.numMedecinTraitant === medecin.numMedecin)
+    if (consultations.length > 0 || assuresAffectes.length > 0) {
+      msg += '\n\n'
+      if (consultations.length > 0) {
+        msg += `• ${consultations.length} consultation(s) resteront dans le système\n`
+      }
+      if (assuresAffectes.length > 0) {
+        msg += `• ${assuresAffectes.length} assuré(s) perdront leur médecin traitant\n`
+      }
+    }
+    msg += '\nCette action est irréversible.'
+    const ok = await ask(msg)
+    if (ok) {
+      try {
+        await deleteMedecin(medecin.numMedecin)
+        toast.show(`Dr. ${medecin.prenom} ${medecin.nom} a été supprimé`, 'success')
+        router.push('/medecins')
+      } catch {
+        toast.show('La suppression a échoué', 'error')
+      }
+    }
   }
 
   const columns = [
@@ -110,9 +129,26 @@ export default function MedecinDetailPage({ params }: { params: Promise<{ id: st
     },
   ]
 
+  if (isLoading) {
+    return (
+      <div>
+        <Skeleton className="h-40" />
+      </div>
+    )
+  }
+
+  if (!medecin) {
+    return (
+      <div>
+        <Card>
+          <p className="text-text-anthracite/60 text-center py-8">Médecin introuvable</p>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div>
-      <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Médecins', href: '/medecins' }, { label: `Dr. ${medecin.prenom} ${medecin.nom}` }]} />
 
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -130,26 +166,7 @@ export default function MedecinDetailPage({ params }: { params: Promise<{ id: st
           </Badge>
           {user?.role === 'AGENT_OSS' && (
             <button
-              onClick={async () => {
-                let msg = `Êtes-vous sûr de vouloir supprimer Dr. ${medecin.prenom} ${medecin.nom} ?`
-                const assuresAffectes = assures.filter(a => a.numMedecinTraitant === medecin.numMedecin)
-                if (consultations.length > 0 || assuresAffectes.length > 0) {
-                  msg += '\n\n'
-                  if (consultations.length > 0) {
-                    msg += `• ${consultations.length} consultation(s) resteront dans le système\n`
-                  }
-                  if (assuresAffectes.length > 0) {
-                    msg += `• ${assuresAffectes.length} assuré(s) perdront leur médecin traitant\n`
-                  }
-                }
-                msg += '\nCette action est irréversible.'
-                const ok = await ask(msg)
-                if (ok) {
-                  supprimerMedecin(medecin.numMedecin)
-                  toast.show(`Dr. ${medecin.prenom} ${medecin.nom} a été supprimé`, 'success')
-                  router.push('/medecins')
-                }
-              }}
+              onClick={handleSupprimer}
               className="p-2 text-alert-red/50 hover:text-alert-red hover:bg-alert-red/5 transition-colors"
               title="Supprimer le médecin"
             >

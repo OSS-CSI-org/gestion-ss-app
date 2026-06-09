@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useMemo, useRef } from 'react'
-import { feuillesMaladie, medecins, assures } from '@/data/mock'
-import { Remboursement } from '@/lib/types'
+import { Remboursement, ModeReglement } from '@/lib/types'
 import { useAuth } from '@/hooks/useAuth'
+import { useFeuilles } from '@/hooks/data/useFeuilles'
+import { useMedecins } from '@/hooks/data/useMedecins'
+import { useAssures } from '@/hooks/data/useAssures'
+import { effectuerRemboursement } from '@/lib/services/remboursements'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useKeyboard } from '@/hooks/useKeyboard'
 import Card from '@/components/ui/Card'
@@ -11,6 +14,8 @@ import DataTable from '@/components/ui/DataTable'
 import StatusBadge from '@/components/ui/StatusBadge'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
+import { TableSkeleton } from '@/components/ui/Skeleton'
+import { useToast } from '@/components/ui/Toast'
 import RemboursementFlow from '@/components/remboursements/RemboursementFlow'
 import FacturePreview from '@/components/facture/FacturePreview'
 import { formatCurrency } from '@/lib/utils'
@@ -28,22 +33,30 @@ type RembWithMeta = Remboursement & {
 export default function FeuillesMaladiePage() {
   const router = useRouter()
   const { user } = useAuth()
+  const { feuilles, isLoading, mutate } = useFeuilles()
+  const { medecins } = useMedecins()
+  const { assures } = useAssures()
+  const toast = useToast()
 
   const mesFeuilles = useMemo(() => {
-    if (user?.role !== 'MEDECIN') return feuillesMaladie
+    if (user?.role !== 'MEDECIN') return feuilles
     const medecin = medecins.find(m => m.login === user.login)
     if (!medecin) return []
-    return feuillesMaladie.filter(f => f.numMedecin === medecin.numMedecin)
-  }, [user])
+    return feuilles.filter(f => f.numMedecin === medecin.numMedecin)
+  }, [user, feuilles, medecins])
 
-  const [remboursements, setRemboursements] = useState<RembWithMeta[]>(
-    mesFeuilles.flatMap(f => f.remboursements.map(r => ({
-      ...r,
-      numFeuille: f.numFeuille,
-      patientNom: f.nomAssure,
-      medecinNom: f.nomMedecin,
-      dateConsult: f.dateConsultation,
-    })))
+  const remboursements = useMemo<RembWithMeta[]>(
+    () =>
+      mesFeuilles.flatMap(f =>
+        f.remboursements.map(r => ({
+          ...r,
+          numFeuille: f.numFeuille,
+          patientNom: f.nomAssure,
+          medecinNom: f.nomMedecin,
+          dateConsult: f.dateConsultation,
+        })),
+      ),
+    [mesFeuilles],
   )
   const [filterStatut, setFilterStatut] = useState<'TOUS' | 'EN_ATTENTE' | 'EFFECTUE'>('TOUS')
   const [search, setSearch] = useState('')
@@ -68,16 +81,15 @@ export default function FeuillesMaladiePage() {
     },
   })
 
-  const handleRemboursementComplete = (numRemb: number) => {
-    setRemboursements(prev =>
-      prev.map(r =>
-        r.numRemboursement === numRemb
-          ? { ...r, statut: 'EFFECTUE' as const, dateRemboursement: new Date().toISOString().split('T')[0], agentLogin: 'admin' }
-          : r
-      )
-    )
-    setJustCompletedId(numRemb)
-    setTimeout(() => setJustCompletedId(null), 4000)
+  const handleRemboursementComplete = async (numRemb: number, mode: ModeReglement) => {
+    try {
+      await effectuerRemboursement(numRemb, mode)
+      await mutate()
+      setJustCompletedId(numRemb)
+      setTimeout(() => setJustCompletedId(null), 4000)
+    } catch {
+      toast.show('Le remboursement a échoué', 'error')
+    }
   }
 
   const selectedRemb = modalRemb
@@ -188,8 +200,12 @@ export default function FeuillesMaladiePage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">Feuilles de maladie</h1>
-          <p className="text-sm text-text-anthracite/60">Gestion des consultations et remboursements</p>
+          <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">
+            {user?.role === 'MEDECIN' ? 'Feuilles de maladie' : 'Remboursements'}
+          </h1>
+          <p className="text-sm text-text-anthracite/60">
+            {user?.role === 'MEDECIN' ? 'Gestion des feuilles de maladie' : 'Gestion des remboursements'}
+          </p>
         </div>
         {user?.role === 'MEDECIN' && (
           <Link href="/feuilles-maladie/nouvelle">
@@ -251,11 +267,15 @@ export default function FeuillesMaladiePage() {
               ))}
           </div>
         </div>
-        <DataTable
-          columns={columns}
-          data={filtered}
-          onRowClick={(r: RembWithMeta) => router.push(`/feuilles-maladie/${r.numFeuille}`)}
-        />
+        {isLoading ? (
+          <TableSkeleton rows={6} />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filtered}
+            onRowClick={(r: RembWithMeta) => router.push(`/feuilles-maladie/${r.numFeuille}`)}
+          />
+        )}
       </Card>
 
       {modalRemb && (

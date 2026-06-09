@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, use } from 'react'
-import { feuillesMaladie, assures } from '@/data/mock'
-import { Remboursement } from '@/lib/types'
+import { Remboursement, ModeReglement } from '@/lib/types'
+import { useFeuille } from '@/hooks/data/useFeuilles'
+import { useAssure } from '@/hooks/data/useAssures'
+import { effectuerRemboursement } from '@/lib/services/remboursements'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import StatusBadge from '@/components/ui/StatusBadge'
@@ -10,8 +12,9 @@ import DataTable from '@/components/ui/DataTable'
 import RemboursementFlow from '@/components/remboursements/RemboursementFlow'
 import FacturePreview from '@/components/facture/FacturePreview'
 import Button from '@/components/ui/Button'
+import Skeleton from '@/components/ui/Skeleton'
+import { useToast } from '@/components/ui/Toast'
 import { ArrowLeft, Printer, Calendar, Stethoscope, User, Crosshair, Heart, Weight, Ruler, Thermometer, Wind, Activity, HandCoins, CheckCircle } from 'lucide-react'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { formatCurrency, formatDateShort, formatTaux } from '@/lib/utils'
@@ -21,15 +24,26 @@ export default function FeuilleDetailPage({ params }: { params: Promise<{ id: st
   const { id } = use(params)
   const router = useRouter()
   const { user } = useAuth()
-  const [feuilles, setFeuilles] = useState(feuillesMaladie)
+  const toast = useToast()
+  const { feuille, isLoading, mutate } = useFeuille(Number(id))
+  const { assure } = useAssure(feuille?.numAssure ?? NaN)
   const [modalRemb, setModalRemb] = useState<number | null>(null)
   const [factureRemb, setFactureRemb] = useState<number | null>(null)
-  const feuille = feuilles.find(f => f.numFeuille === Number(id))
+
+  if (isLoading) {
+    return (
+      <div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-40" />
+          <Skeleton className="h-40" />
+        </div>
+      </div>
+    )
+  }
 
   if (!feuille) {
     return (
       <div>
-        <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Feuilles de maladie', href: '/feuilles-maladie' }]} />
         <Card>
           <p className="text-text-anthracite/60 text-center py-8">Feuille introuvable</p>
         </Card>
@@ -37,16 +51,14 @@ export default function FeuilleDetailPage({ params }: { params: Promise<{ id: st
     )
   }
 
-  const handleRemboursementComplete = (numRemb: number) => {
-    setFeuilles(prev => prev.map(f => ({
-      ...f,
-      remboursements: f.remboursements.map(r =>
-        r.numRemboursement === numRemb
-          ? { ...r, statut: 'EFFECTUE' as const, dateRemboursement: new Date().toISOString().split('T')[0], agentLogin: 'admin' }
-          : r
-      ),
-    })))
+  const handleRemboursementComplete = async (numRemb: number, mode: ModeReglement) => {
     setModalRemb(null)
+    try {
+      await effectuerRemboursement(numRemb, mode)
+      await mutate()
+    } catch {
+      toast.show('Le remboursement a échoué', 'error')
+    }
   }
 
   const rembColumns = [
@@ -109,10 +121,11 @@ export default function FeuilleDetailPage({ params }: { params: Promise<{ id: st
           {r.statut === 'EFFECTUE' && user?.role === 'AGENT_OSS' && (
             <button
               onClick={() => setFactureRemb(r.numRemboursement)}
-              className="p-1.5 text-prune-sec hover:bg-prune-sec/10 transition-colors"
-              title="Voir / imprimer la facture"
+              className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium border border-prune-sec/30 text-prune-sec hover:bg-prune-sec/5 transition-colors"
+              title="Voir la facture"
             >
-              <Printer size={15} />
+              <Printer size={13} />
+              Facture
             </button>
           )}
         </div>
@@ -125,7 +138,6 @@ export default function FeuilleDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div>
-      <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Feuilles de maladie', href: '/feuilles-maladie' }, { label: `Feuille n°${feuille.numFeuille}` }]} />
 
         <div className="flex flex-col md:flex-row items-start gap-3 md:gap-0 justify-between mb-6">
           <div>
@@ -337,12 +349,11 @@ export default function FeuilleDetailPage({ params }: { params: Promise<{ id: st
       {modalRemb !== null && (() => {
         const remb = feuille.remboursements.find(r => r.numRemboursement === modalRemb)
         if (!remb) return null
-        const patient = assures.find(a => a.numAssure === feuille.numAssure)
         return (
           <RemboursementFlow
             remboursement={remb}
             patientNom={feuille.nomAssure}
-            patientIban={patient?.numCompteBancaire}
+            patientIban={assure?.numCompteBancaire}
             onComplete={handleRemboursementComplete}
             onClose={() => setModalRemb(null)}
           />

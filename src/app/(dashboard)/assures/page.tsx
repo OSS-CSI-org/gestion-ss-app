@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useMemo, useRef } from 'react'
-import { assures, medecins } from '@/data/mock'
 import { Assure } from '@/lib/types'
 import { useAuth } from '@/hooks/useAuth'
+import { useAssures } from '@/hooks/data/useAssures'
+import { useMedecins } from '@/hooks/data/useMedecins'
+import { deleteAssure } from '@/lib/services/assures'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useKeyboard } from '@/hooks/useKeyboard'
@@ -12,6 +14,7 @@ import Card from '@/components/ui/Card'
 import DataTable from '@/components/ui/DataTable'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
+import { TableSkeleton } from '@/components/ui/Skeleton'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Plus, Search, Trash2 } from 'lucide-react'
@@ -20,20 +23,20 @@ import { formatDateShort } from '@/lib/utils'
 export default function AssuresPage() {
   const router = useRouter()
   const { user } = useAuth()
+  const { assures, isLoading, mutate } = useAssures()
+  const { medecins } = useMedecins()
   const { confirm: ask, dialog: confirmDialog } = useConfirm()
   const toast = useToast()
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
   const searchRef = useRef<HTMLInputElement>(null)
-  const [deletedIds, setDeletedIds] = useState<number[]>([])
 
   const filteredAssures = useMemo(() => {
-    const list = assures.filter(a => !deletedIds.includes(a.numAssure))
-    if (user?.role !== 'MEDECIN') return list
+    if (user?.role !== 'MEDECIN') return assures
     const medecin = medecins.find(m => m.login === user.login)
     if (!medecin) return []
-    return list.filter(a => a.numMedecinTraitant === medecin.numMedecin)
-  }, [user, deletedIds])
+    return assures.filter(a => a.numMedecinTraitant === medecin.numMedecin)
+  }, [user, assures, medecins])
 
   const filtered = filteredAssures.filter(a =>
     `${a.nom} ${a.prenom}`.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -51,8 +54,13 @@ export default function AssuresPage() {
   const handleDelete = async (a: Assure) => {
     const ok = await ask(`Êtes-vous sûr de vouloir supprimer ${a.prenom} ${a.nom} (N° ${a.numAssure}) ? Cette action est irréversible.`)
     if (ok) {
-      setDeletedIds(prev => [...prev, a.numAssure])
-      toast.show(`${a.prenom} ${a.nom} a été supprimé`, 'success')
+      try {
+        await deleteAssure(a.numAssure)
+        await mutate()
+        toast.show(`${a.prenom} ${a.nom} a été supprimé`, 'success')
+      } catch {
+        toast.show('La suppression a échoué', 'error')
+      }
     }
   }
 
@@ -157,11 +165,15 @@ export default function AssuresPage() {
             className="w-full border border-text-anthracite/15 bg-white-pure pl-9 pr-3 py-2 text-sm text-text-anthracite placeholder:text-text-anthracite/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-prune-main/40 focus-visible:border-prune-main transition-colors"
           />
         </div>
-        <DataTable
-          columns={columns}
-          data={filtered}
-          onRowClick={(a: Assure) => router.push(`/assures/${a.numAssure}`)}
-        />
+        {isLoading ? (
+          <TableSkeleton rows={6} />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filtered}
+            onRowClick={(a: Assure) => router.push(`/assures/${a.numAssure}`)}
+          />
+        )}
       </Card>
       {confirmDialog}
     </div>

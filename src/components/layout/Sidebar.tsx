@@ -9,7 +9,6 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import ThemeToggle from '@/components/ui/ThemeToggle'
-import { medecins } from '@/data/mock'
 
 const agentNav = [
   { href: '/', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -85,7 +84,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       <div className="p-4 border-t border-white/10">
         {user?.role === 'MEDECIN' ? (
           <Link
-            href={`/medecins/${medecins.find(m => m.login === user.login)?.numMedecin}`}
+            href={`/medecins/${user.numMedecin}`}
             onClick={onClose}
             className="flex items-center gap-3 px-2 py-2 hover:bg-white/5 transition-colors rounded"
           >

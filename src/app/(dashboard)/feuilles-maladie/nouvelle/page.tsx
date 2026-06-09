@@ -5,7 +5,10 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useKeyboard } from '@/hooks/useKeyboard'
-import { assures, medecins } from '@/data/mock'
+import { useAssures } from '@/hooks/data/useAssures'
+import { useMedecins } from '@/hooks/data/useMedecins'
+import { createFeuille } from '@/lib/services/feuilles'
+import { useToast } from '@/components/ui/Toast'
 import { feuilleSchema, type FeuilleFormData } from '@/lib/schemas'
 import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
@@ -15,7 +18,6 @@ import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { Plus, X, FileText, Heart, Activity } from 'lucide-react'
 import EmptyState from '@/components/ui/EmptyState'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { useAuth } from '@/hooks/useAuth'
 
 interface PrescriptionItem {
@@ -51,6 +53,9 @@ function NouvelleFeuillePageContent() {
 function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }) {
   const router = useRouter()
   const { user } = useAuth()
+  const { assures } = useAssures()
+  const { medecins } = useMedecins()
+  const toast = useToast()
   const currentMedecin = medecins.find(m => m.login === user?.login)
   const [prescriptions, setPrescriptions] = useState<PrescriptionItem[]>([])
   const [submitted, setSubmitted] = useState(false)
@@ -131,8 +136,13 @@ function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }
     setPrescriptions(prev => prev.filter((_, i) => i !== idx))
   }
 
-  const onSubmit = (data: FeuilleFormData) => {
-    setSubmitted(true)
+  const onSubmit = async (data: FeuilleFormData) => {
+    try {
+      await createFeuille(data)
+      setSubmitted(true)
+    } catch {
+      toast.show("L'enregistrement de la feuille a échoué", 'error')
+    }
   }
 
   const watchedDateConsultation = watch('dateConsultation')
@@ -142,7 +152,6 @@ function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }
   if (submitted) {
     return (
       <div>
-        <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Feuilles de maladie', href: '/feuilles-maladie' }, { label: 'Nouvelle feuille' }]} />
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">Nouvelle feuille de maladie</h1>
           <p className="text-sm text-text-anthracite/60">Enregistrement d&apos;une consultation</p>
@@ -174,7 +183,6 @@ function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }
 
   return (
     <div>
-      <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Feuilles de maladie', href: '/feuilles-maladie' }, { label: 'Nouvelle feuille' }]} />
       <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">Nouvelle feuille de maladie</h1>
           <p className="text-sm text-text-anthracite/60">Saisie d&apos;une consultation médicale</p>

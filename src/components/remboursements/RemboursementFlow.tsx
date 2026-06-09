@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, animate } from 'framer-motion'
-import { Remboursement } from '@/lib/types'
+import { Remboursement, ModeReglement } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
 import Input from '@/components/ui/Input'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -13,7 +13,7 @@ interface RemboursementFlowProps {
   remboursement: Remboursement
   patientNom: string
   patientIban?: string
-  onComplete: (rembId: number) => void
+  onComplete: (rembId: number, mode: ModeReglement) => void
   onClose: () => void
 }
 
@@ -106,7 +106,7 @@ export default function RemboursementFlow({
   const handleCompleter = () => {
     setStamping(true)
     setTimeout(() => {
-      onComplete(remboursement.numRemboursement)
+      onComplete(remboursement.numRemboursement, mode)
       onClose()
     }, 1200)
   }

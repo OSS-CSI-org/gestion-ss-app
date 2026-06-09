@@ -14,8 +14,8 @@ import Button from '@/components/ui/Button'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import RoleGuard from '@/components/auth/RoleGuard'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
-import { ajouterUtilisateur } from '@/data/mock'
+import { createMedecin } from '@/lib/services/medecins'
+import { useToast } from '@/components/ui/Toast'
 
 export default function NouveauMedecinPage() {
   return (
@@ -91,12 +91,14 @@ const SPECIALITES = [
   'Soins palliatifs',
 ]
 
+const DEFAULT_MDP = 'med@2026'
+
 function NouveauMedecinForm() {
   const router = useRouter()
+  const toast = useToast()
   const [added, setAdded] = useState(false)
-  const DEFAULT_MDP = 'med@2026'
 
-  const { control, register, handleSubmit, setValue, watch, formState: { errors } } = useForm<MedecinFormData>({
+  const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<MedecinFormData>({
     resolver: zodResolver(medecinSchema),
     defaultValues: {
       nom: '',
@@ -121,15 +123,13 @@ function NouveauMedecinForm() {
     }
   }, [prenom, setValue])
 
-  const onSubmit = (data: MedecinFormData) => {
-    ajouterUtilisateur({
-      login: data.login,
-      nom: data.nom,
-      prenom: data.prenom,
-      role: 'MEDECIN',
-      motDePasse: DEFAULT_MDP,
-    })
-    setAdded(true)
+  const onSubmit = async (data: MedecinFormData) => {
+    try {
+      await createMedecin(data)
+      setAdded(true)
+    } catch {
+      toast.show("La création du médecin a échoué", 'error')
+    }
   }
 
   if (added) {
@@ -139,7 +139,6 @@ function NouveauMedecinForm() {
           <Link href="/medecins" className="text-text-anthracite/60 hover:text-prune-main transition-colors">
             <ArrowLeft size={20} />
           </Link>
-          <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Médecins', href: '/medecins' }, { label: 'Nouveau médecin' }]} />
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">Médecin ajouté</h1>
             <p className="text-sm text-text-anthracite/60">Le compte a été créé avec succès</p>
@@ -176,7 +175,6 @@ function NouveauMedecinForm() {
           <Link href="/medecins" className="text-text-anthracite/60 hover:text-prune-main transition-colors">
             <ArrowLeft size={20} />
           </Link>
-          <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Médecins', href: '/medecins' }, { label: 'Nouveau médecin' }]} />
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold text-prune-main mb-1">Nouveau médecin</h1>
             <p className="text-sm text-text-anthracite/60">Inscrire un nouveau médecin</p>
@@ -295,7 +293,7 @@ function NouveauMedecinForm() {
           )}
 
           <div className="flex gap-3 pt-2">
-            <Button type="submit">Ajouter le médecin</Button>
+            <Button type="submit" loading={isSubmitting}>Ajouter le médecin</Button>
             <Link href="/medecins">
               <Button type="button" variant="secondary">Annuler</Button>
             </Link>

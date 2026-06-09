@@ -1,7 +1,10 @@
 'use client'
 
 import { use } from 'react'
-import { assures, feuillesMaladie } from '@/data/mock'
+import { useAssure } from '@/hooks/data/useAssures'
+import { useFeuilles } from '@/hooks/data/useFeuilles'
+import { deleteAssure } from '@/lib/services/assures'
+import Skeleton from '@/components/ui/Skeleton'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import StatusBadge from '@/components/ui/StatusBadge'
@@ -9,7 +12,6 @@ import DataTable from '@/components/ui/DataTable'
 import Button from '@/components/ui/Button'
 import { ArrowLeft, Mail, Calendar, User, CreditCard, Stethoscope, FileText, FilePlus, Banknote, Trash2 } from 'lucide-react'
 import EmptyState from '@/components/ui/EmptyState'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import Link from 'next/link'
 import { formatCurrency, formatDateShort } from '@/lib/utils'
 import { FeuilleMaladie } from '@/lib/types'
@@ -24,12 +26,20 @@ export default function AssureDetailPage({ params }: { params: Promise<{ id: str
   const { confirm: ask, dialog: confirmDialog } = useConfirm()
   const toast = useToast()
   const router = useRouter()
-  const assure = assures.find(a => a.numAssure === Number(id))
+  const { assure, isLoading } = useAssure(Number(id))
+  const { feuilles: allFeuilles } = useFeuilles()
+
+  if (isLoading) {
+    return (
+      <div>
+        <Skeleton className="h-40" />
+      </div>
+    )
+  }
 
   if (!assure) {
     return (
       <div>
-        <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Assurés', href: '/assures' }]} />
         <Card>
           <p className="text-text-anthracite/60 text-center py-8">Assuré introuvable</p>
         </Card>
@@ -37,7 +47,7 @@ export default function AssureDetailPage({ params }: { params: Promise<{ id: str
     )
   }
 
-  const feuilles = feuillesMaladie.filter(f => f.numAssure === assure.numAssure)
+  const feuilles = allFeuilles.filter(f => f.numAssure === assure.numAssure)
 
   const totalRembourse = feuilles.reduce((sum, f) =>
     sum + f.remboursements.filter(r => r.statut === 'EFFECTUE').reduce((s, r) => s + r.montant, 0), 0
@@ -107,7 +117,6 @@ export default function AssureDetailPage({ params }: { params: Promise<{ id: str
 
   return (
     <div>
-      <Breadcrumbs items={[{ label: 'Accueil', href: '/' }, { label: 'Assurés', href: '/assures' }, { label: `${assure.prenom} ${assure.nom}` }]} />
 
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -123,8 +132,13 @@ export default function AssureDetailPage({ params }: { params: Promise<{ id: str
               onClick={async () => {
                 const ok = await ask(`Êtes-vous sûr de vouloir supprimer l'assuré ${assure.prenom} ${assure.nom} ? Cette action est irréversible.`)
                 if (ok) {
-                  toast.show(`${assure.prenom} ${assure.nom} a été supprimé`, 'success')
-                  router.push('/assures')
+                  try {
+                    await deleteAssure(assure.numAssure)
+                    toast.show(`${assure.prenom} ${assure.nom} a été supprimé`, 'success')
+                    router.push('/assures')
+                  } catch {
+                    toast.show('La suppression a échoué', 'error')
+                  }
                 }
               }}
               className="p-2 text-alert-red/50 hover:text-alert-red hover:bg-alert-red/5 transition-colors"

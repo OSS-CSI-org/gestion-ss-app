@@ -9,7 +9,10 @@ import MonthlyChart from '@/components/charts/MonthlyChart'
 import PaymentModeChart from '@/components/charts/PaymentModeChart'
 import RemboursementStatusChart from '@/components/charts/RemboursementStatusChart'
 import { useAuth } from '@/hooks/useAuth'
-import { assures, feuillesMaladie, medecins } from '@/data/mock'
+import { useAssures } from '@/hooks/data/useAssures'
+import { useMedecins } from '@/hooks/data/useMedecins'
+import { useFeuilles } from '@/hooks/data/useFeuilles'
+import { StatCardSkeleton } from '@/components/ui/Skeleton'
 import { formatCurrency, formatDateShort } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
@@ -24,6 +27,9 @@ const periods: { label: string; value: Period }[] = [
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { assures } = useAssures()
+  const { medecins } = useMedecins()
+  const { feuilles, isLoading } = useFeuilles()
   const [period, setPeriod] = useState<Period>(30)
 
   const cutoff = useMemo(() => {
@@ -33,8 +39,8 @@ export default function DashboardPage() {
   }, [period])
 
   const filteredFeuilles = useMemo(
-    () => feuillesMaladie.filter(f => new Date(f.dateEmission) >= cutoff),
-    [cutoff]
+    () => feuilles.filter(f => new Date(f.dateEmission) >= cutoff),
+    [feuilles, cutoff]
   )
 
   const enAttente = useMemo(
@@ -54,10 +60,20 @@ export default function DashboardPage() {
     return { total: virements + cash, virements, cash }
   }, [filteredFeuilles])
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <StatCardSkeleton key={i} />
+        ))}
+      </div>
+    )
+  }
+
   if (user?.role === 'MEDECIN') {
     const medecin = medecins.find(m => m.login === user.login)
     const aujourdhui = new Date().toISOString().split('T')[0]
-    const mesConsultations = feuillesMaladie.filter(f => f.numMedecin === medecin?.numMedecin)
+    const mesConsultations = feuilles.filter(f => f.numMedecin === medecin?.numMedecin)
     const aujourdhuiCount = mesConsultations.filter(f => f.dateConsultation === aujourdhui).length
     const mesPatients = new Set(mesConsultations.map(f => f.numAssure)).size
     const enAttenteCount = mesConsultations.filter(f => f.remboursements.some(r => r.statut === 'EN_ATTENTE')).length
