@@ -1,11 +1,29 @@
 import { Remboursement, FeuilleMaladie } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
 
+/** Assainit un texte pour un nom de fichier (accents retirés, espaces → tirets). */
+function slug(texte: string): string {
+  return texte
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')       // retire les accents
+    .replace(/[^a-zA-Z0-9]+/g, '-')        // tout le reste → tiret
+    .replace(/^-+|-+$/g, '')               // pas de tiret en début/fin
+}
+
 /**
- * Génère le document HTML complet de la facture (sans <title> ni script
- * d'auto-impression). L'absence de <title> évite que le navigateur affiche
- * « Facture… » dans l'en-tête d'impression ; le rendu se fait dans un <iframe>
- * (cf. FacturePreview), ce qui supprime aussi l'URL de l'app en pied de page.
+ * Nom de fichier professionnel pour la facture, ex. « Facture-OSS-Thomas-Essomba-2026-06-09 ».
+ * Sert de titre du document → c'est le nom proposé par « Enregistrer en PDF ».
+ */
+export function nomFichierFacture(feuille: FeuilleMaladie, remboursement: Remboursement): string {
+  const dateISO = (remboursement.dateRemboursement || new Date().toISOString().split('T')[0]).slice(0, 10)
+  return `Facture-OSS-${slug(feuille.nomAssure)}-${dateISO}`
+}
+
+/**
+ * Génère le document HTML complet de la facture.
+ * Le <title> porte un nom de fichier pro (utilisé par « Enregistrer en PDF ») ;
+ * grâce à `@page { margin: 0 }`, il n'apparaît PAS dans les marges imprimées.
+ * Le rendu se fait dans un <iframe> (cf. FacturePreview).
  */
 export function genererFactureHTML(feuille: FeuilleMaladie, remboursement: Remboursement): string {
   const date = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -16,6 +34,7 @@ export function genererFactureHTML(feuille: FeuilleMaladie, remboursement: Rembo
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <title>${nomFichierFacture(feuille, remboursement)}</title>
   <style>
     /* margin: 0 supprime les en-têtes/pieds automatiques du navigateur
        (date, n° de page, URL) qui se logent dans la marge de page.

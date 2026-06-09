@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Printer, X, FileText } from 'lucide-react'
 import { Remboursement, FeuilleMaladie } from '@/lib/types'
-import { genererFactureHTML } from '@/lib/imprimerFacture'
+import { genererFactureHTML, nomFichierFacture } from '@/lib/imprimerFacture'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import Button from '@/components/ui/Button'
 
@@ -41,8 +41,15 @@ export default function FacturePreview({ feuille, remboursement, onClose }: Fact
   const handlePrint = () => {
     const win = iframeRef.current?.contentWindow
     if (!win) return
+    // Certains navigateurs déduisent le nom du PDF du titre de l'onglet parent,
+    // d'autres du <title> de l'iframe : on couvre les deux puis on restaure.
+    const prevTitle = document.title
+    document.title = nomFichierFacture(feuille, remboursement)
+    const restore = () => { document.title = prevTitle }
     win.focus() // requis pour Safari
     win.print()
+    win.addEventListener('afterprint', restore, { once: true })
+    setTimeout(restore, 1000)
   }
 
   return (
