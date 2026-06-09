@@ -1,23 +1,28 @@
-'use client'
-
 import { Remboursement, FeuilleMaladie } from '@/lib/types'
+import { formatCurrency } from '@/lib/utils'
 
-export default function imprimerFacture(feuille: FeuilleMaladie, remboursement: Remboursement) {
-  const w = window.open('', '_blank')
-  if (!w) return
-
+/**
+ * Génère le document HTML complet de la facture (sans <title> ni script
+ * d'auto-impression). L'absence de <title> évite que le navigateur affiche
+ * « Facture… » dans l'en-tête d'impression ; le rendu se fait dans un <iframe>
+ * (cf. FacturePreview), ce qui supprime aussi l'URL de l'app en pied de page.
+ */
+export function genererFactureHTML(feuille: FeuilleMaladie, remboursement: Remboursement): string {
   const date = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
   const numeroFacture = `FACT-${feuille.numFeuille}-${remboursement.numRemboursement}`
 
-  w.document.write(`
+  return `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Facture de remboursement n°${numeroFacture}</title>
   <style>
-    @page { margin: 18mm 15mm; }
+    /* margin: 0 supprime les en-têtes/pieds automatiques du navigateur
+       (date, n° de page, URL) qui se logent dans la marge de page.
+       Les marges visuelles sont recréées via le padding de .invoice. */
+    @page { margin: 0; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; }
     body {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 11px;
@@ -28,7 +33,7 @@ export default function imprimerFacture(feuille: FeuilleMaladie, remboursement: 
     .invoice {
       max-width: 210mm;
       margin: 0 auto;
-      padding: 0;
+      padding: 18mm 15mm;
       position: relative;
     }
     .watermark {
@@ -278,13 +283,13 @@ export default function imprimerFacture(feuille: FeuilleMaladie, remboursement: 
         <tbody>
           <tr>
             <td>${remboursement.nature}</td>
-            <td>${(remboursement.montant / remboursement.taux).toFixed(2).replace('.', ',')} FCFA</td>
+            <td>${formatCurrency(remboursement.montant / remboursement.taux)}</td>
             <td>${Math.round(remboursement.taux * 100)}%</td>
-            <td>${remboursement.montant.toFixed(2).replace('.', ',')} FCFA</td>
+            <td>${formatCurrency(remboursement.montant)}</td>
           </tr>
           <tr class="total-row">
             <td colspan="3">Total remboursé</td>
-            <td>${remboursement.montant.toFixed(2).replace('.', ',')} FCFA</td>
+            <td>${formatCurrency(remboursement.montant)}</td>
           </tr>
         </tbody>
       </table>
@@ -318,9 +323,7 @@ export default function imprimerFacture(feuille: FeuilleMaladie, remboursement: 
       <p>Office de Sécurité Sociale</p>
     </div>
   </div>
-  <script>window.print();window.close();</script>
 </body>
 </html>
-  `)
-  w.document.close()
+  `
 }
