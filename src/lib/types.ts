@@ -1,5 +1,5 @@
 export type TypeMedecin = 'GENERALISTE' | 'SPECIALISTE'
-export type StatutRemboursement = 'EN_ATTENTE' | 'EFFECTUE' | 'REJETEE'
+export type StatutRemboursement = 'EN_ATTENTE' | 'EFFECTUE'
 export type ModeReglement = 'VIREMENT' | 'CASH'
 export type Sexe = 'M' | 'F'
 export type Role = 'AGENT_OSS' | 'MEDECIN'

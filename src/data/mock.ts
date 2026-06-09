@@ -20,6 +20,24 @@ export function mettreAJourMotDePasse(login: string, nouveauMotDePasse: string) 
   }
 }
 
+export function supprimerMedecin(numMedecin: number) {
+  const med = medecins.find(m => m.numMedecin === numMedecin)
+  if (!med) return
+
+  const idx = medecins.indexOf(med)
+  medecins.splice(idx, 1)
+
+  const userIdx = utilisateurs.findIndex(u => u.login === med.login)
+  if (userIdx !== -1) utilisateurs.splice(userIdx, 1)
+
+  assures.forEach(a => {
+    if (a.numMedecinTraitant === numMedecin) {
+      a.numMedecinTraitant = 0
+      a.nomMedecinTraitant = ''
+    }
+  })
+}
+
 export const assures: Assure[] = [
   { numAssure: 1, nom: 'Essomba', prenom: 'Marie-Claire', email: 'mc.essomba@email.cm', dateNaissance: '1985-06-15', sexe: 'F', numCompteBancaire: 'CM21100010001000123456', numMedecinTraitant: 1, nomMedecinTraitant: 'Dr. Mbarga Béatrice' },
   { numAssure: 2, nom: 'Biyong', prenom: 'Lucas', email: 'lucas.biyong@email.cm', dateNaissance: '1992-03-22', sexe: 'M', numCompteBancaire: 'CM21100010001000123457', numMedecinTraitant: 1, nomMedecinTraitant: 'Dr. Mbarga Béatrice' },
@@ -100,7 +118,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     ],
     remboursements: [
       { numRemboursement: 2, nature: 'Consultation généraliste', taux: 0.8, montant: 4000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 2 },
-      { numRemboursement: 3, nature: 'Consultation spécialiste', taux: 0.75, montant: 9000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 2 },
+      { numRemboursement: 3, nature: 'Consultation spécialiste', taux: 1.0, montant: 9000, modeReglement: 'CASH', statut: 'EN_ATTENTE', numFeuille: 2 },
     ],
   },
   {
@@ -177,7 +195,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 6, nature: 'Consultation spécialiste', taux: 0.75, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 5, dateRemboursement: '2026-05-27', agentLogin: 'admin' },
+      { numRemboursement: 6, nature: 'Consultation spécialiste', taux: 1.0, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 5, dateRemboursement: '2026-05-27', agentLogin: 'admin' },
     ],
   },
   {
@@ -270,7 +288,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 10, nature: 'Consultation spécialiste', taux: 0.75, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 9, dateRemboursement: '2026-05-16', agentLogin: 'admin' },
+      { numRemboursement: 10, nature: 'Consultation spécialiste', taux: 1.0, montant: 12000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 9, dateRemboursement: '2026-05-16', agentLogin: 'admin' },
     ],
   },
   {
@@ -322,7 +340,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 12, nature: 'Consultation spécialiste', taux: 0.75, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 11, dateRemboursement: '2026-05-11', agentLogin: 'admin' },
+      { numRemboursement: 12, nature: 'Consultation spécialiste', taux: 1.0, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 11, dateRemboursement: '2026-05-11', agentLogin: 'admin' },
     ],
   },
   {
@@ -349,7 +367,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 6, datePrescription: '2026-05-08', type: 'MEDICAMENT', contenu: 'Hydroquinone 4% crème - application locale soir 1x/jour', numConsultation: 12, nomMedicament: 'Hydroquinone 4%', posologie: 'application locale soir 1x/jour', dosage: '4%' },
     ],
     remboursements: [
-      { numRemboursement: 13, nature: 'Consultation spécialiste', taux: 0.75, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 12, dateRemboursement: '2026-05-09', agentLogin: 'admin' },
+      { numRemboursement: 13, nature: 'Consultation spécialiste', taux: 1.0, montant: 10000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 12, dateRemboursement: '2026-05-09', agentLogin: 'admin' },
     ],
   },
   {
@@ -374,7 +392,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 14, nature: 'Consultation spécialiste', taux: 0.75, montant: 10000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 13, dateRemboursement: '2026-05-05', agentLogin: 'admin' },
+      { numRemboursement: 14, nature: 'Consultation spécialiste', taux: 1.0, montant: 10000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 13, dateRemboursement: '2026-05-05', agentLogin: 'admin' },
     ],
   },
   {
@@ -526,7 +544,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 20, nature: 'Consultation spécialiste', taux: 0.75, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 19, dateRemboursement: '2026-04-16', agentLogin: 'admin' },
+      { numRemboursement: 20, nature: 'Consultation spécialiste', taux: 1.0, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 19, dateRemboursement: '2026-04-16', agentLogin: 'admin' },
     ],
   },
   {
@@ -601,7 +619,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 23, nature: 'Consultation spécialiste', taux: 0.75, montant: 12000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 22, dateRemboursement: '2026-03-28', agentLogin: 'admin' },
+      { numRemboursement: 23, nature: 'Consultation spécialiste', taux: 1.0, montant: 12000, modeReglement: 'CASH', statut: 'EFFECTUE', numFeuille: 22, dateRemboursement: '2026-03-28', agentLogin: 'admin' },
     ],
   },
   {
@@ -628,32 +646,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
       { numPrescription: 9, datePrescription: '2026-03-22', type: 'MEDICAMENT', contenu: 'Collyre antibiotique - 1 goutte 4x/jour pendant 7 jours', numConsultation: 23, nomMedicament: 'Collyre antibiotique', posologie: '1 goutte 4x/jour', dosage: '0.3%' },
     ],
     remboursements: [
-      { numRemboursement: 24, nature: 'Consultation spécialiste', taux: 0.75, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 23, dateRemboursement: '2026-03-23', agentLogin: 'admin' },
-    ],
-  },
-  {
-    numFeuille: 24,
-    dateEmission: '2026-03-15',
-    statut: 'REJETEE',
-    numConsultation: 24,
-    numAssure: 11,
-    nomAssure: 'Rosine Bella',
-    numMedecin: 7,
-    nomMedecin: 'Dr. Nkada Muriel',
-    dateConsultation: '2026-03-15',
-    motif: 'Consultation non justifiée',
-    symptomes: 'Aucun symptôme — demande de certificat',
-    diagnostic: 'Aucun trouble diagnostiqué',
-    traitementPrescrit: 'Aucun',
-    parametresMedicaux: {
-      poids: '63', taille: '1.66', temperature: '36.6', tensionArterielle: '11/7',
-      frequenceCardiaque: '70', frequenceRespiratoire: '16', saturationOxygene: '99',
-      antecedents: 'Aucun',
-      observations: 'Consultation pour certificat de complaisance — non remboursable.',
-    },
-    prescriptions: [],
-    remboursements: [
-      { numRemboursement: 25, nature: 'Consultation généraliste', taux: 0, montant: 0, modeReglement: 'VIREMENT', statut: 'REJETEE', numFeuille: 24 },
+      { numRemboursement: 24, nature: 'Consultation spécialiste', taux: 1.0, montant: 8000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 23, dateRemboursement: '2026-03-23', agentLogin: 'admin' },
     ],
   },
   {
@@ -678,7 +671,7 @@ export const feuillesMaladie: FeuilleMaladie[] = [
     },
     prescriptions: [],
     remboursements: [
-      { numRemboursement: 26, nature: 'Consultation spécialiste', taux: 0.75, montant: 6000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 25, dateRemboursement: '2026-03-11', agentLogin: 'admin' },
+      { numRemboursement: 26, nature: 'Consultation spécialiste', taux: 1.0, montant: 6000, modeReglement: 'VIREMENT', statut: 'EFFECTUE', numFeuille: 25, dateRemboursement: '2026-03-11', agentLogin: 'admin' },
     ],
   },
 ]
