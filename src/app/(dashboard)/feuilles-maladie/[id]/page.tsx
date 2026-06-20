@@ -289,7 +289,7 @@ export default function FeuilleDetailPage({ params }: { params: Promise<{ id: st
                   </Badge>
                 </div>
                 {p.type === 'MEDICAMENT' ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 text-sm">
                     <div>
                       <p className="text-xs text-text-anthracite/60 uppercase tracking-wider mb-1">Médicament</p>
                       <p className="font-medium text-prune-main">{p.nomMedicament}</p>
@@ -301,6 +301,10 @@ export default function FeuilleDetailPage({ params }: { params: Promise<{ id: st
                     <div>
                       <p className="text-xs text-text-anthracite/60 uppercase tracking-wider mb-1">Posologie</p>
                       <p className="font-medium">{p.posologie}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-text-anthracite/60 uppercase tracking-wider mb-1">Durée</p>
+                      <p className="font-medium">{p.duree}</p>
                     </div>
                   </div>
                 ) : (

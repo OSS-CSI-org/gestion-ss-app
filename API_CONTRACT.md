@@ -31,7 +31,7 @@ suffit de passer `NEXT_PUBLIC_DATA_SOURCE=http` et `NEXT_PUBLIC_API_URL=<url>`
 ## Authentification
 
 ### POST /auth/login
-Body : `{ "login": string, "motDePasse": string }`
+Body : `{ "login": string, "password": string }`
 200 : `{ "token": string, "user": AuthUser }`
 401 : identifiants invalides.
 
@@ -125,7 +125,7 @@ FeuilleInput = { numAssure, numMedecin, dateConsultation, motif, symptomes?,
   prescriptions?: PrescriptionInput[] }
 
 PrescriptionInput =
-  | { type: "MEDICAMENT", nomMedicament: string, dosage?: string, posologie?: string }
+  | { type: "MEDICAMENT", nomMedicament: string, dosage?: string, posologie?: string, duree?: string }
   | { type: "CONSULTATION_SPECIALISTE", numSpecialiste: number, motifMedical?: string }
 ```
 

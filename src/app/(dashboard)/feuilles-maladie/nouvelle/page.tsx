@@ -25,6 +25,7 @@ interface PrescriptionItem {
   nomMedicament?: string
   posologie?: string
   dosage?: string
+  duree?: string
   numSpecialiste?: string
   nomSpecialiste?: string
   motifMedical?: string
@@ -117,6 +118,7 @@ function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }
       nomMedicament: '',
       posologie: '',
       dosage: '',
+      duree: '',
     }])
   }
 
@@ -138,7 +140,7 @@ function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }
 
   const onSubmit = async (data: FeuilleFormData) => {
     try {
-      await createFeuille(data)
+      await createFeuille({ ...data, prescriptions })
       setSubmitted(true)
     } catch {
       toast.show("L'enregistrement de la feuille a échoué", 'error')
@@ -366,7 +368,7 @@ function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }
                 </div>
 
                 {p.type === 'MEDICAMENT' ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <Input
                       label="Médicament"
                       value={p.nomMedicament || ''}
@@ -384,6 +386,12 @@ function NouvelleFeuilleForm({ defaultPatientId }: { defaultPatientId?: string }
                       value={p.posologie || ''}
                       onChange={e => updatePrescription(idx, 'posologie', e.target.value)}
                       placeholder="1 comprimé 3x/jour"
+                    />
+                    <Input
+                      label="Durée"
+                      value={p.duree || ''}
+                      onChange={e => updatePrescription(idx, 'duree', e.target.value)}
+                      placeholder="5 jours"
                     />
                   </div>
                 ) : (

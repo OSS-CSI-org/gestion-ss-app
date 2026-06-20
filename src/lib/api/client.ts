@@ -1,4 +1,4 @@
-import { API_URL, TOKEN_KEY } from './config'
+import { API_URL, TOKEN_KEY, USER_KEY } from './config'
 
 /** Erreur normalisée pour tous les appels API. */
 export class ApiError extends Error {
@@ -46,6 +46,14 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     } catch {
       // réponse non-JSON : on garde le message par défaut
     }
+
+    if (res.status === 401 && token && !path.includes('/auth/')) {
+      window.localStorage.removeItem(TOKEN_KEY)
+      window.localStorage.removeItem(USER_KEY)
+      const redirect = encodeURIComponent(window.location.pathname)
+      window.location.href = `/login?reason=session_expired&redirect=${redirect}`
+    }
+
     throw new ApiError(res.status, message)
   }
 

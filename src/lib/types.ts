@@ -52,6 +52,7 @@ export interface Prescription {
   nomMedicament?: string
   posologie?: string
   dosage?: string
+  duree?: string
   typeExamen?: string
   motifMedical?: string
   numSpecialiste?: number

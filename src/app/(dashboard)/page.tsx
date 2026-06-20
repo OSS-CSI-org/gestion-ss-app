@@ -17,12 +17,14 @@ import { formatCurrency, formatDateShort } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 
-type Period = 7 | 30 | 90
+type Period = 7 | 30 | 90 | 365 | 'all'
 
 const periods: { label: string; value: Period }[] = [
   { label: '7 jours', value: 7 },
   { label: '30 jours', value: 30 },
   { label: '90 jours', value: 90 },
+  { label: '1 an', value: 365 },
+  { label: 'Toutes', value: 'all' },
 ]
 
 export default function DashboardPage() {
@@ -32,20 +34,17 @@ export default function DashboardPage() {
   const { feuilles, isLoading } = useFeuilles()
   const [period, setPeriod] = useState<Period>(30)
 
-  const cutoff = useMemo(() => {
+  const filteredFeuilles = useMemo(() => {
+    if (period === 'all') return feuilles
     const d = new Date()
     d.setDate(d.getDate() - period)
-    return d
-  }, [period])
+    return feuilles.filter(f => new Date(f.dateEmission) >= d)
+  }, [feuilles, period])
 
-  const filteredFeuilles = useMemo(
-    () => feuilles.filter(f => new Date(f.dateEmission) >= cutoff),
-    [feuilles, cutoff]
-  )
-
+  /** File d'attente agent OSS : toutes les feuilles avec remboursement(s) en attente, sans filtre de période. */
   const enAttente = useMemo(
-    () => filteredFeuilles.filter(f => f.remboursements.some(r => r.statut === 'EN_ATTENTE')),
-    [filteredFeuilles]
+    () => feuilles.filter(f => (f.remboursements ?? []).some(r => r.statut === 'EN_ATTENTE')),
+    [feuilles]
   )
 
   const statTotals = useMemo(() => {
@@ -220,8 +219,8 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Médecins"
-          value={new Set(filteredFeuilles.map(f => f.numMedecin)).size}
-          subtitle="Praticiens"
+          value={medecins.length}
+          subtitle="Praticiens inscrits"
           icon={<Activity size={24} />}
           href="/medecins"
         />
@@ -287,7 +286,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
         <div className="lg:col-span-2">
-          <MonthlyChart feuilles={filteredFeuilles} />
+          <MonthlyChart feuilles={feuilles} />
         </div>
         <PaymentModeChart feuilles={filteredFeuilles} />
       </div>

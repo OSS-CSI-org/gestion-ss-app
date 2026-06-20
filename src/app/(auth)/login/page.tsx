@@ -3,19 +3,26 @@
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { Loader2 } from 'lucide-react'
 import LoginForm from '@/components/auth/LoginForm'
 
 export default function LoginPage() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       router.push('/')
     }
-  }, [isAuthenticated, router])
+  }, [loading, isAuthenticated, router])
 
-  if (isAuthenticated) return null
+  if (loading || isAuthenticated) {
+    return (
+      <div className="flex justify-center py-16" aria-busy="true" aria-label="Chargement">
+        <Loader2 size={28} className="animate-spin text-prune-main" />
+      </div>
+    )
+  }
 
   return <LoginForm />
 }

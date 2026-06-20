@@ -23,6 +23,16 @@ import { Plus, Filter, Search, HandCoins, Printer } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+type Period = 7 | 30 | 90 | 365 | 'all'
+
+const periods: { label: string; value: Period }[] = [
+  { label: '7 jours', value: 7 },
+  { label: '30 jours', value: 30 },
+  { label: '90 jours', value: 90 },
+  { label: '1 an', value: 365 },
+  { label: 'Toutes', value: 'all' },
+]
+
 type RembWithMeta = Remboursement & {
   patientNom: string
   medecinNom: string
@@ -45,9 +55,18 @@ export default function FeuillesMaladiePage() {
     return feuilles.filter(f => f.numMedecin === medecin.numMedecin)
   }, [user, feuilles, medecins])
 
+  const [period, setPeriod] = useState<Period>(30)
+
+  const periodFilteredFeuilles = useMemo(() => {
+    if (period === 'all') return mesFeuilles
+    const d = new Date()
+    d.setDate(d.getDate() - period)
+    return mesFeuilles.filter(f => new Date(f.dateEmission) >= d)
+  }, [mesFeuilles, period])
+
   const remboursements = useMemo<RembWithMeta[]>(
     () =>
-      mesFeuilles.flatMap(f =>
+      periodFilteredFeuilles.flatMap(f =>
         f.remboursements.map(r => ({
           ...r,
           numFeuille: f.numFeuille,
@@ -56,7 +75,7 @@ export default function FeuillesMaladiePage() {
           dateConsult: f.dateConsultation,
         })),
       ),
-    [mesFeuilles],
+    [periodFilteredFeuilles],
   )
   const [filterStatut, setFilterStatut] = useState<'TOUS' | 'EN_ATTENTE' | 'EFFECTUE'>('TOUS')
   const [search, setSearch] = useState('')
@@ -215,6 +234,25 @@ export default function FeuillesMaladiePage() {
             </Button>
           </Link>
         )}
+      </div>
+
+      <div className="flex items-center gap-3 mb-6 overflow-x-auto">
+        <span className="text-xs font-medium uppercase tracking-wider text-text-anthracite/60 whitespace-nowrap">Période</span>
+        <div className="flex bg-white-pure border border-text-anthracite/5 text-sm">
+          {periods.map(p => (
+            <button
+              key={p.value}
+              onClick={() => setPeriod(p.value)}
+              className={`px-3 py-1.5 transition-colors ${
+                period === p.value
+                  ? 'bg-prune-main text-prune-light'
+                  : 'text-text-anthracite/60 hover:text-prune-main'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

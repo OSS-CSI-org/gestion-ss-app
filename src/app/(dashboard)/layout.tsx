@@ -16,9 +16,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push('/login')
+      const params = new URLSearchParams()
+      if (pathname && pathname !== '/') {
+        params.set('redirect', pathname)
+      }
+      const query = params.toString()
+      router.push(query ? `/login?${query}` : '/login')
     }
-  }, [loading, isAuthenticated, router])
+  }, [loading, isAuthenticated, router, pathname])
 
   useEffect(() => {
     setSidebarOpen(false)
