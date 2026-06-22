@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -38,8 +39,14 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
     <aside className="h-full bg-prune-main flex flex-col">
       <div className="p-6 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 border border-sable-gold/50 flex items-center justify-center">
-            <span className="text-sm font-bold text-sable-gold">OSS</span>
+          <div className="w-9 h-9 flex items-center justify-center">
+            <Image
+              src="/logo_oss-rbg.png"
+              alt="OSS"
+              width={36}
+              height={36}
+              className="object-contain"
+            />
           </div>
           <div>
             <p className="text-sm font-medium text-prune-light">OSS</p>

@@ -94,16 +94,14 @@ export function genererFactureHTML(feuille: FeuilleMaladie, remboursement: Rembo
     .logo-block {
       width: 42px;
       height: 42px;
-      border: 2px solid rgba(180, 145, 85, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .logo-block span {
-      font-size: 16px;
-      font-weight: 700;
-      color: #4A1B2E;
-      letter-spacing: 1px;
+    .logo-block img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
     .header-left h1 {
       font-size: 18px;
@@ -239,7 +237,7 @@ export function genererFactureHTML(feuille: FeuilleMaladie, remboursement: Rembo
 
     <div class="header">
       <div class="header-left">
-        <div class="logo-block"><span>OSS</span></div>
+        <div class="logo-block"><img src="/logo_oss-rbg.png" alt="OSS"></div>
         <div>
           <h1>OSS</h1>
           <p>Service des remboursements · Direction Générale</p>

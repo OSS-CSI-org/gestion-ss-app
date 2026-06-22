@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { Eye, EyeOff, Info } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -42,8 +43,15 @@ function LoginFormInner() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
       <div className="text-center mb-2 lg:hidden">
-        <div className="inline-flex items-center justify-center w-14 h-14 border border-sable-gold/40 mb-4">
-          <span className="text-2xl font-bold text-prune-main">OSS</span>
+        <div className="mb-4 inline-flex items-center justify-center">
+          <Image
+            src="/logo_oss-rbg.png"
+            alt="OSS"
+            width={100}
+            height={100}
+            className="object-contain"
+            priority
+          />
         </div>
         <h1 className="text-lg font-semibold text-prune-main">Connexion</h1>
       </div>

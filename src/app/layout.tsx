@@ -8,7 +8,10 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 
 export const metadata: Metadata = {
   title: 'OSS — Gestion',
-  description: 'Application de gestion des prestations de sécurité sociale',
+  description: 'Application de gestion d \'un organisme de sécurité sociale',
+  icons: {
+    icon: '/logo_oss-rbg.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

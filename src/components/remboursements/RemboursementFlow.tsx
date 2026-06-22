@@ -8,6 +8,7 @@ import Input from '@/components/ui/Input'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { HandCoins, Check, ArrowRight, Building, User as UserIcon, X, Loader2, Banknote, Coins } from 'lucide-react'
+import Image from 'next/image'
 
 interface RemboursementFlowProps {
   remboursement: Remboursement
@@ -234,7 +235,16 @@ export default function RemboursementFlow({
                     <Building size={13} className="text-prune-main/60" />
                     <span className="text-[11px] font-semibold text-text-anthracite/60 uppercase tracking-wider">Émetteur</span>
                   </div>
-                  <p className="text-sm font-medium text-prune-main">OSS</p>
+                  <div className="flex items-center gap-1.5">
+                    <Image
+                      src="/logo_oss-rbg.png"
+                      alt="OSS"
+                      width={18}
+                      height={18}
+                      className="object-contain"
+                    />
+                    <span className="text-sm font-medium text-prune-main">OSS</span>
+                  </div>
                   <p className="text-[11px] text-text-anthracite/60 font-mono">OSS-00-0001256</p>
                 </div>
 
