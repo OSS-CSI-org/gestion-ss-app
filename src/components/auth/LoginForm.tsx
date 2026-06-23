@@ -91,8 +91,7 @@ function LoginFormInner() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-text-anthracite/60 hover:text-prune-main transition-colors"
-            tabIndex={-1}
+            className="text-text-anthracite/60 hover:text-prune-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-prune-main/40"
             aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
