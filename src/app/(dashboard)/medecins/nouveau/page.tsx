@@ -91,7 +91,7 @@ const SPECIALITES = [
   'Soins palliatifs',
 ]
 
-const DEFAULT_MDP = 'med@2026'
+const DEFAULT_MDP = 'Medecin@2026'
 
 function NouveauMedecinForm() {
   const router = useRouter()
