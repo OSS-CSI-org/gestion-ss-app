@@ -13,7 +13,7 @@ export const DATA_SOURCE: DataSource =
   process.env.NEXT_PUBLIC_DATA_SOURCE === 'http' ? 'http' : 'mock'
 
 export const API_URL: string =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || 'http://localhost:8080/api'
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || '/api'
 
 export const USE_MOCK = DATA_SOURCE === 'mock'
 
