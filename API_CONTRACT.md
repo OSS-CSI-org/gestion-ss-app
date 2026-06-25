@@ -91,7 +91,7 @@ Medecin = {
   typeFormation?: string, nomSpecialite?: string,
   actif: boolean, estAssure?: boolean
 }
-MedecinInput = { nom, prenom, email?, dateNaissance, sexe, login, typeMedecin, typeFormation?, nomSpecialite? }
+MedecinInput = { nom, prenom, email?, dateNaissance, sexe, login, typeMedecin, typeFormation?, nomSpecialite?, estAssure?, numCompteBancaire?, numMedecinTraitant? }
 ```
 
 ---

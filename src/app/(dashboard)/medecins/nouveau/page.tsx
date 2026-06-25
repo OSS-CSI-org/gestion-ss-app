@@ -16,6 +16,7 @@ import Link from 'next/link'
 import RoleGuard from '@/components/auth/RoleGuard'
 import { createMedecin } from '@/lib/services/medecins'
 import { useToast } from '@/components/ui/Toast'
+import { useMedecins } from '@/hooks/data/useMedecins'
 
 export default function NouveauMedecinPage() {
   return (
@@ -96,6 +97,7 @@ const DEFAULT_MDP = 'Medecin@2026'
 function NouveauMedecinForm() {
   const router = useRouter()
   const toast = useToast()
+  const { medecins } = useMedecins()
   const [added, setAdded] = useState(false)
 
   const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<MedecinFormData>({
@@ -110,11 +112,19 @@ function NouveauMedecinForm() {
       typeMedecin: 'GENERALISTE',
       typeFormation: '',
       nomSpecialite: '',
+      estAssure: false,
+      numCompteBancaire: '',
+      numMedecinTraitant: undefined as any,
     },
   })
 
   const prenom = watch('prenom')
   const typeMedecin = watch('typeMedecin')
+  const estAssure = watch('estAssure')
+
+  const generalistes = medecins
+    .filter(m => m.typeMedecin === 'GENERALISTE' && m.actif)
+    .map(m => ({ value: String(m.numMedecin), label: `Dr. ${m.prenom} ${m.nom}` }))
 
   useEffect(() => {
     const trimmed = prenom.trim().toLowerCase().replace(/\s+/g, '')
@@ -290,6 +300,38 @@ function NouveauMedecinForm() {
                 />
               )}
             />
+          )}
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              {...register('estAssure')}
+              className="w-4 h-4 rounded border-text-anthracite/30 text-prune-main focus:ring-prune-main/40"
+            />
+            <span className="text-sm text-text-anthracite">Ce médecin est également assuré</span>
+          </label>
+
+          {estAssure && (
+            <div className="flex flex-col gap-5 pl-4 border-l-2 border-prune-main/20">
+              <Input
+                label="Numéro de compte bancaire (IBAN)"
+                {...register('numCompteBancaire')}
+                placeholder="CM21 XXXX XXXX XXXX XXXX XXXX XXX"
+              />
+              <Controller
+                name="numMedecinTraitant"
+                control={control}
+                render={({ field }) => (
+                  <SearchableSelect
+                    label="Médecin traitant"
+                    options={generalistes}
+                    placeholder="Sélectionner un généraliste"
+                    value={field.value ? String(field.value) : ''}
+                    onChange={v => field.onChange(v ? Number(v) : undefined)}
+                  />
+                )}
+              />
+            </div>
           )}
 
           <div className="flex gap-3 pt-2">

@@ -28,6 +28,9 @@ export const medecinSchema = z.object({
   typeMedecin: z.enum(['GENERALISTE', 'SPECIALISTE']),
   typeFormation: z.string().optional().or(z.literal('')),
   nomSpecialite: z.string().optional().or(z.literal('')),
+  estAssure: z.boolean().optional(),
+  numCompteBancaire: z.string().optional().or(z.literal('')),
+  numMedecinTraitant: z.number().optional(),
 })
 
 export type MedecinFormData = z.infer<typeof medecinSchema>

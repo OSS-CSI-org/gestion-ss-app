@@ -30,6 +30,10 @@ export function supprimerMedecin(numMedecin: number) {
   const userIdx = utilisateurs.findIndex(u => u.login === med.login)
   if (userIdx !== -1) utilisateurs.splice(userIdx, 1)
 
+  // Supprimer l'assuré lié si le médecin était aussi assuré
+  const assureIdx = assures.findIndex(a => a.nom === med.nom && a.prenom === med.prenom)
+  if (assureIdx !== -1) assures.splice(assureIdx, 1)
+
   assures.forEach(a => {
     if (a.numMedecinTraitant === numMedecin) {
       a.numMedecinTraitant = 0

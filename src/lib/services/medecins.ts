@@ -2,6 +2,7 @@ import { USE_MOCK } from '@/lib/api/config'
 import { apiFetch, ApiError } from '@/lib/api/client'
 import {
   medecins,
+  assures,
   utilisateurs,
   ajouterUtilisateur,
   mettreAJourMotDePasse,
@@ -50,6 +51,7 @@ export async function createMedecin(data: MedecinFormData): Promise<Medecin> {
       typeFormation: data.typeFormation || undefined,
       nomSpecialite: data.nomSpecialite || undefined,
       actif: true,
+      estAssure: data.estAssure ?? false,
     }
     medecins.push(nouveau)
     ajouterUtilisateur({
@@ -59,6 +61,24 @@ export async function createMedecin(data: MedecinFormData): Promise<Medecin> {
       role: 'MEDECIN',
       motDePasse: MOT_DE_PASSE_DEFAUT,
     })
+    // Si le médecin est aussi assuré, créer une fiche d'assuré correspondante
+    if (data.estAssure) {
+      const numAssure = Math.max(0, ...assures.map(a => a.numAssure)) + 1
+      const traitant = data.numMedecinTraitant
+        ? medecins.find(m => m.numMedecin === data.numMedecinTraitant)
+        : undefined
+      assures.push({
+        numAssure,
+        nom: data.nom,
+        prenom: data.prenom,
+        email: data.email || undefined,
+        dateNaissance: data.dateNaissance,
+        sexe: data.sexe,
+        numCompteBancaire: data.numCompteBancaire || undefined,
+        numMedecinTraitant: data.numMedecinTraitant || undefined,
+        nomMedecinTraitant: traitant ? `Dr. ${traitant.prenom} ${traitant.nom}` : undefined,
+      })
+    }
     return nouveau
   }
   return apiFetch<Medecin>('/medecins', { method: 'POST', body: data })
